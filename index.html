@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Membership Card Generator</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        max-width: 400px;
+        margin: 30px auto;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    form {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input[type="text"], input[type="email"], input[type="number"], select, input[type="file"] {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .card h2 {
+        text-align: center;
+        color: #333;
+    }
+    .card p {
+        margin: 10px 0;
+        font-size: 16px;
+        color: #555;
+    }
+    .card img {
+        display: block;
+        margin: 0 auto;
+        margin-top: 10px;
+        max-width: 100%;
+        border-radius: 8px;
+        height: 120px; 
+    }
+    .download-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        text-decoration: none;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    .download-link:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Membership Card Generator</h1>
+
+    <form id="membershipForm" action="insert_data.php" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="number">Number:</label>
+        <input type="number" id="number" name="number" required>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select>
+        <label for="photo">Upload Photo:</label>
+        <input type="file" id="photo" name="photo">
+        <button type="button" onclick="generateCard()">Generate Membership Card</button>
+    </form>
+
+    <div id="cardContainer" class="card" style="display:none;">
+        <h2>Membership Card</h2>
+        <p id="cardDetails"></p>
+        <canvas id="cardCanvas" width="400" height="250" style="display:none;"></canvas>
+        <img id="cardImage" src="" alt="Membership Card">
+        <a id="downloadLink" class="download-link" download="membership_card.png" style="display:none;">Download Membership Card</a>
+    </div>
+</div>
+
+<script>
+function generateCard() {
+    var name = document.getElementById("name").value;
+    var email = document.getElementById("email").value;
+    var number = document.getElementById("number").value;
+    var age = document.getElementById("age").value;
+    var gender = document.getElementById("gender").value;
+    var photo = document.getElementById("photo").files[0];
+
+    var cardDetails = "<strong>Name:</strong> " + name + "<br><strong>Email:</strong> " + email + "<br><strong>Number:</strong> " + number + "<br><strong>Age:</strong> " + age + "<br><strong>Gender:</strong> " + gender;
+
+    var currentDate = new Date();
+    var expiryDate = new Date(currentDate);
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1); // Expiry after 1 year
+
+    cardDetails += "<br><strong>Created Date:</strong> " + currentDate.toLocaleDateString() + "<br><strong>Expiry Date:</strong> " + expiryDate.toLocaleDateString();
+
+    document.getElementById("cardDetails").innerHTML = cardDetails;
+
+  
+    var canvas = document.getElementById("cardCanvas");
+    var ctx = canvas.getContext("2d");
+
+ 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var bgImage = new Image();
+    bgImage.onload = function() {
+        ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+
+        var logo = new Image();
+        logo.onload = function() {
+            ctx.globalAlpha = 0.5; 
+            ctx.drawImage(logo, 20, 20, 40, 40); 
+
+            ctx.globalAlpha = 1;
+
+  
+            ctx.font = "bold 12px Arial";
+            ctx.fillStyle = "#000";
+
+      
+            ctx.fillStyle = "#000";
+            ctx.fillText("Name:", 20, 90);
+            ctx.fillText("Email:", 20, 110);
+            ctx.fillText("Number:", 20, 130);
+            ctx.fillText("Age:", 20, 150); 
+            ctx.fillText("Gender:", 20, 170); 
+            ctx.fillText("Created Date:", 20, 190); 
+            ctx.fillText("Expiry Date:", 20, 210); 
+
+            ctx.fillStyle = "#333";
+            ctx.fillText(name, 110, 90); 
+            ctx.fillText(email, 110, 110); 
+            ctx.fillText(number, 110, 130); 
+            ctx.fillText(age, 110, 150); 
+            ctx.fillText(gender, 110, 170); 
+            ctx.fillText(currentDate.toLocaleDateString(), 110, 190);
+            ctx.fillText(expiryDate.toLocaleDateString(), 110, 210); 
+
+            if (photo) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    var img = new Image();
+                    img.onload = function() {
+                        ctx.drawImage(img, 310, 90, 80, 120); 
+                        var cardImage = document.getElementById("cardImage");
+                        cardImage.src = canvas.toDataURL("image/png");
+
+                        var downloadLink = document.getElementById("downloadLink");
+                        downloadLink.href = cardImage.src;
+                        
+                        document.getElementById("cardContainer").style.display = "block";
+                        downloadLink.style.display = "block";
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(photo);
+            } else {
+                var cardImage = document.getElementById("cardImage");
+                cardImage.src = canvas.toDataURL("image/png");
+
+                var downloadLink = document.getElementById("downloadLink");
+                downloadLink.href = cardImage.src;
+                
+                document.getElementById("cardContainer").style.display = "block";
+                downloadLink.style.display = "block";
+            }
+        };
+        logo.src = 'logo.png'; 
+    };
+    bgImage.src = 'h.jpg'; 
+}
+</script>
+
+</body>
+</html>
